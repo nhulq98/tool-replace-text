@@ -1,1 +1,2 @@
-<script type="text/javascript" src="//$STATIC_RESOURCE_DOMAIN/images/entrysonypoint_300x30.gif"></script>
+
+</script><link rel="stylesheet" type="text/css" href="/nhu/nhu/nhu/css/haha.css">

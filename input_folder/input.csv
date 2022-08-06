@@ -1,3 +1,4 @@
-old,new,status
-common.js,notcommon.js,ok
-css.css,delte,ok
+old,action,status,expect value,actual,
+common.js,change.js,,change,OK,
+quangnhu.js,delete,,delete,OK,
+entrysonypoint_300x30.js,delete,,constant,,not exist

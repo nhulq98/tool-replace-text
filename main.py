@@ -4,6 +4,7 @@ import csv
 # for open and read all folders, files in OS system
 import os
 import re # regex
+import logging
 
 # -----------------------------------------
 
@@ -47,7 +48,7 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
     _replace_reg = re.compile(old_text)
     for dirpath, dirnames, filenames in os.walk(folder_target_path):
 
-        # loop to all files in folder
+        # Loop to all files in folder
         for file in filenames:
             file = os.path.join(dirpath, file)
             target_txt_file = file + ".txt"
@@ -56,8 +57,12 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
                 with open(file, errors="ignore") as source:
                     print('source: ' + file)
                     for line in source:
-                        line = _replace_reg.sub(new_text, line)
-                        target.write(line)
+                        new_line = _replace_reg.sub(new_text, line)
+                        if(line != new_line):
+                            logging.info('Đã tìm thấy ' + old_text)
+                            target.write(new_line)
+                        else:
+                            target.write(line)
             os.remove(file)  # apply for Windows OS, let's comment this in linux OS
             os.rename(target_txt_file, file)
 
