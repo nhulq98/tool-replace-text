@@ -10,6 +10,10 @@ LƯU Ý: mỗi lần chỉ sài 1 loại HTML tag type trong file csv
 VD: giờ ta muốn change all tag <img>
 thì trong file csv chỉ nên bao gồm các đường dẫn img
 và tag type truyền vào cũng phải là 'img'
+
+- Khi ctrinh chạy xong ta cần quan tâm và đi search log sau:
+ERROR
+để xem các lỗi nghiêm trọng cần handle bằng tay
 """
 
 import csv
