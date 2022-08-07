@@ -20,6 +20,7 @@ import csv
 import os
 import re
 import logging
+from cgitb import html
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(message)s')
@@ -27,6 +28,12 @@ logging.basicConfig(level=logging.DEBUG,
 csv_file_path = 'C:/Users/Quang Nhu/PycharmProjects/pythonProject/input_folder/input.csv'
 folder_need_to_change_path = 'C:/Users/Quang Nhu/PycharmProjects/pythonProject/folder-demo'
 
+
+# html_tag_dict = {
+#     'SCRIPT': 'script',
+#     'IMG': 'img',
+#     'link': 'link'
+# }
 
 def remove_html_tags(data=None, tag_type=None):
     """
@@ -40,21 +47,21 @@ def remove_html_tags(data=None, tag_type=None):
 
     if tag_type == 'script' or tag_type == 'SCRIPT':
         # init regex object
-        # p = re.compile(r'<script(.*)</script>', flags=re.IGNORECASE)
-        p = re.compile(r'<script.*?/script>', flags=re.IGNORECASE)
+        # regexObject = re.compile(r'<script(.*)</script>', flags=re.IGNORECASE)
+        regex_object = re.compile(r'<script.*?/script>', flags=re.IGNORECASE)
 
-        result = p.sub('', data)  # search regex in data and replace by empty string
+        result = regex_object.sub('', data)  # search regex in data and replace by empty string
 
         if result == data:  # not found
             # show log lên là: đang search text nào, trên file nào, nhắc xóa bằng tay
-            logging.error('<script> not found, '
-                          'because </script> xuống dòng,'
-                          ' please manual handle by your hands!')
+            logging.error('Không thể xóa vì không tìm thấy thẻ </script>, '
+                          'Vì có thể thẻ </script> được xuống dòng,'
+                          ' Hãy xử lý bằng tay!')
             return False
     else:
-        p = re.compile(r'<' + tag_type + '.*?>', flags=re.IGNORECASE)
+        regex_object = re.compile(r'<' + tag_type + '.*?>', flags=re.IGNORECASE)
 
-    return p.sub('', data)
+    return regex_object.sub('', data)  # remove tag type
 
 
 def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_text=None, html_tag_type=None):
@@ -68,59 +75,77 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
     example: replace_text_in_files_of_folder('D:/pythonProject/', 'lqnhu', 'lequangnhu')
     """
 
-    logging.debug('-----Tìm \' ' + old_text + ' \' | action: ' + new_text)
-    # === for logging====
-    count = 0
-    files_found = []
-    # ===/ for logging====
+    logging.debug('Tìm \'' + old_text + '\' | action: \'' + new_text + '\'')
+    log_count_number_found_old_text = 0
+    log_found_files_list = []
+    log_count_number_changed = 0
+    log_number_sucess = 0
+    log_number_failed = 0
 
     # init regex object to search text
     _replace_reg = re.compile(old_text)
-    for dirpath, dirnames, filenames in os.walk(folder_target_path):
+    for dir_path, dir_names, file_names in os.walk(folder_target_path):
 
         # loop to all files in folder
-        for file in filenames:
-            file = os.path.join(dirpath, file)
+        for file in file_names:
+
+            file = os.path.join(dir_path, file)  # concat filename to path (/home/nhulq/index.html)
             target_txt_file = file + ".txt"
             try:
-                with open(target_txt_file, "w") as target:  # open new file to write
-                    with open(file, errors="ignore") as source:  # open file to find!
-                        for line in source:
-                            new_line = _replace_reg.sub(new_text, line)
-                            if line != new_line:  # found at this line!
+                with open(target_txt_file, "w") as target_file:  # open new file to write
+                    with open(file, errors="ignore") as source_file:  # open file in OS to find old_text!
+                        # loop each line in current file
+                        for line_text in source_file:
+                            line_is_changed = _replace_reg.sub(new_text,
+                                                               line_text)  # return text (find and replace old_text become new_text in line)
+                            if line_text != line_is_changed:  # found at current line!
+                                logging.debug('Đã tìm thấy: \'' + old_text + '\' tại file: ' + file)
+                                log_count_number_found_old_text += 1
+                                log_found_files_list.append(file)
+
                                 if new_text != 'delete':
-                                    target.write(new_line)
+                                    target_file.write(line_is_changed)
+
+                                    logging.debug('Change thành công')
+                                    log_count_number_changed += 1
                                 else:
                                     if html_tag_type == 'img' or html_tag_type == 'link':  # action to delete
-                                        target.write(remove_html_tags(line, html_tag_type))
+                                        target_file.write(remove_html_tags(line_text, html_tag_type))
+
+                                        logging.debug('Xóa thành công thẻ: ' + html_tag_type)
+                                        log_count_number_changed += 1
 
                                     elif html_tag_type == 'script' or html_tag_type == 'SCRIPT':
-                                        logging.debug('script tag: ' + line)
-                                        result = remove_html_tags(line, html_tag_type)
+                                        result = remove_html_tags(line_text, html_tag_type)
                                         if result != False:
-                                            target.write(result)
-                                        else: # not found script
-                                            logging.debug(old_text + ' not found at file: ' + file)
-                                            logging.debug('---------END ROW: '+old_text+'------------')
-                                            target.write(line)
+                                            target_file.write(result)
 
+                                            logging.debug('Xóa thành công thẻ: ' + html_tag_type)
+                                            log_count_number_changed += 1
+                                        else:  # can't delete whole script tag, because not found </script> tag
+                                            logging.debug('Script tag failed: ' + line_text)
+                                            logging.debug('Xóa thất bại thẻ ' + html_tag_type + ' tại file: ' + file)
+                                            log_number_failed += 1
 
-                                # === for logging====
-                                count += 1
-                                files_found.append(file)  # only to show on logging
+                                            target_file.write(line_text)
 
                             else:  # not found old_text
-                                target.write(line)
+                                target_file.write(line_text)
             finally:
                 os.remove(file)  # apply for Windows OS, let's comment this in linux OS
                 os.rename(target_txt_file, file)
 
-    if count == 0:
+    if log_count_number_found_old_text == 0:
         logging.error('Không tìm thấy bất kỳ file nào. xin check lại!')
-        return 'failed'
+        log_number_failed += 1
 
-    # logging.info('Đã tìm thấy ' + str(count) + ' lần và change tại ' + str(len(files_found)) + ' files: ' + files_found)
-    logging.info('Đã tìm thấy %s lần và change tại %s files: %s' % (count, len(files_found), files_found))
+    # remove duplicate files because have exists change > 1 in 1 file
+
+    logging.info('Result(failed: %s | success: %s): '
+                 'Đã tìm thấy %s lần và change %s lần, tại %s files: %s' % (
+                     log_number_failed, log_count_number_changed,
+                     log_count_number_found_old_text, log_count_number_changed, len(set(log_found_files_list)),
+                     set(log_found_files_list)))
     return 'ok'
 
 
@@ -133,23 +158,26 @@ def replace_text_of_folder(csv_file_path, folder_path, html_tag_type):
     :return:
     """
 
-    # read csv file
     try:
         logging.info('---Init tool------')
         logging.info('---Pre - load csv file---')
         with open(csv_file_path) as csv_file:
             logging.info('Load csv file Success!')
+
+            row_count = 1
             csv_reader = csv.DictReader(csv_file)
             for row in csv_reader:
-                logging.debug('----------BEGIN ROW: '+row['old']+'---------------')
-                action = row['action']
+                logging.debug('----------BEGIN ROW %s: %s---------------' % (row_count, row['old']))
+                action = row['action']  # delete or new_text
                 old_text = row['old']
 
-                # search text
                 replace_text_in_files_of_folder(folder_path, old_text, action, html_tag_type)
 
+                logging.debug('---------END ROW: ' + old_text + '------------')
+                row_count += 1
+
     except Exception as e:
-        logging.debug('something wrong')
+        logging.error('Something wrong')
         raise e
     finally:
         logging.info('Tool finished!')

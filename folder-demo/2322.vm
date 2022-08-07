@@ -1,5 +1,9 @@
 <!-- change script-->
-<script type="text/javascript" src="//<%= STATIC_RESOURCE_DOMAIN %>/sp/mypage/js/change.js?20140304"></script>
+<script type="text/javascript" src="//<%= STATIC_RESOURCE_DOMAIN %>/sp/mypage/js/common.js?20140304"></script>
 <!-- can't delete-->
 <script type="text/javascript" src="//<%= STATIC_RESOURCE_DOMAIN %>/sp/mypage/js/quangnhu.js">
 </script>
+
+<!--script delete-->
+result: <img src='sdadsa'>
+<script type="text/javascript" src="//<%= STATIC_RESOURCE_DOMAIN %>/sp/mypage/js/quangnhu.js"></script><img src='sdadsa'>
