@@ -26,6 +26,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
 csv_file_path = 'C:/Users/Quang Nhu/PycharmProjects/pythonProject/input_folder/input.csv'
+csv_file_output_path = 'C:/Users/Quang Nhu/PycharmProjects/pythonProject/output_folder/output.csv'
 folder_need_to_change_path = 'C:/Users/Quang Nhu/PycharmProjects/pythonProject/folder-demo'
 
 
@@ -146,6 +147,9 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
                      log_number_failed, log_count_number_changed,
                      log_count_number_found_old_text, log_count_number_changed, len(set(log_found_files_list)),
                      set(log_found_files_list)))
+    if log_number_failed > 0:
+        return 'failed'
+
     return 'ok'
 
 
@@ -161,20 +165,30 @@ def replace_text_of_folder(csv_file_path, folder_path, html_tag_type):
     try:
         logging.info('---Init tool------')
         logging.info('---Pre - load csv file---')
-        with open(csv_file_path) as csv_file:
-            logging.info('Load csv file Success!')
+        with open(csv_file_output_path, 'w', newline='') as csvfile:  # open file to write
+            fieldnames = ['old', 'action', 'status']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
 
-            row_count = 1
-            csv_reader = csv.DictReader(csv_file)
-            for row in csv_reader:
-                logging.debug('----------BEGIN ROW %s: %s---------------' % (row_count, row['old']))
-                action = row['action']  # delete or new_text
-                old_text = row['old']
+            with open(csv_file_path) as csv_file:  # open file to read
+                logging.info('Load csv file Success!')
 
-                replace_text_in_files_of_folder(folder_path, old_text, action, html_tag_type)
+                log_row_count = 1
 
-                logging.debug('---------END ROW: ' + old_text + '------------')
-                row_count += 1
+                csv_reader = csv.DictReader(csv_file)
+                for row in csv_reader:
+                    logging.debug('----------BEGIN ROW %s: %s---------------' % (log_row_count, row['old']))
+
+                    action = row['action']  # [delete, new_text]
+                    old_text = row['old']
+
+                    status = replace_text_in_files_of_folder(folder_path, old_text, action, html_tag_type)
+
+                    # write to csv_output
+                    writer.writerow({'old': old_text, 'action': action, 'status': status})
+
+                    logging.debug('---------END ROW: ' + old_text + '------------')
+                    log_row_count += 1
 
     except Exception as e:
         logging.error('Something wrong')
