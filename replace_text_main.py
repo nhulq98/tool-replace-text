@@ -25,9 +25,9 @@ from cgitb import html
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s:%(levelname)s:%(message)s')
 
-csv_file_path = 'C:/Users/Quang Nhu/PycharmProjects/pythonProject/input_folder/input.csv'
-csv_file_output_path = 'C:/Users/Quang Nhu/PycharmProjects/pythonProject/output_folder/output.csv'
-folder_need_to_change_path = 'C:/Users/Quang Nhu/PycharmProjects/pythonProject/folder-demo'
+csv_file_path = '/home/nhulq/Desktop/shutto/tool-replace-text/input_folder/input.csv'
+csv_file_output_path = '/home/nhulq/Desktop/shutto/tool-replace-text/output_folder/output.csv'
+folder_need_to_change_path = '/home/nhulq/Desktop/airtrip/skygserv/web'
 
 
 # html_tag_dict = {
@@ -93,8 +93,8 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
             file = os.path.join(dir_path, file)  # concat filename to path (/home/nhulq/index.html)
             target_txt_file = file + ".txt"
             try:
-                with open(target_txt_file, "w") as target_file:  # open new file to write
-                    with open(file, errors="ignore") as source_file:  # open file in OS to find old_text!
+                with open(target_txt_file, "w", encoding="shift-jis") as target_file:  # open new file to write
+                    with open(file, errors="ignore", encoding="shift-jis") as source_file:  # open file in OS to find old_text!
                         # loop each line in current file
                         for line_text in source_file:
                             line_is_changed = _replace_reg.sub(new_text,
@@ -199,6 +199,6 @@ def replace_text_of_folder(csv_file_path, folder_path, html_tag_type):
 
 if __name__ == '__main__':
     # p = remove_html_tags('<script src="../jquery/jquery-1.6.1.min.js"><link src="sdas">', 'script')
-    replace_text_of_folder(csv_file_path, folder_need_to_change_path, 'script')
+    # replace_text_of_folder(csv_file_path, folder_need_to_change_path, 'script')
     # replace_text_of_folder(csv_file_path, folder_need_to_change_path, 'img')
-    # replace_text_of_folder(csv_file_path, folder_need_to_change_path, 'css')
+    replace_text_of_folder(csv_file_path, folder_need_to_change_path, 'link')
