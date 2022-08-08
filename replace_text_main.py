@@ -77,6 +77,9 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
     example: replace_text_in_files_of_folder('D:/pythonProject/', 'lqnhu', 'lequangnhu')
     """
 
+    if(new_text == 'nothing' or new_text =='-'):
+        return 'ok'
+
     logging.debug('Tìm \'' + old_text + '\' | action: \'' + new_text + '\'')
     log_count_number_found_old_text = 0
     log_found_files_list = []
@@ -100,7 +103,8 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
                         with open(file, errors="ignore", encoding="shift-jis") as source_file:  # open file in OS to find old_text!
                             # loop each line in current file
                             for line_text in source_file:
-                                find_result = line_text.find(old_text)
+                                text_find = "\""+old_text
+                                find_result = line_text.find(text_find)
 
                                 # line_is_changed = _replace_reg.sub(new_text,
                                 #                                    line_text)  # return text (find and replace old_text become new_text in line)
@@ -216,4 +220,5 @@ if __name__ == '__main__':
     #                      '<link rel="stylesheet" href="/css/cs.css" media="screen">', 'link')
     # replace_text_of_folder(csv_file_path, folder_need_to_change_path, 'script')
     # replace_text_of_folder(csv_file_path, folder_need_to_change_path, 'img')
-    replace_text_of_folder(csv_file_path_test, folder_need_to_change_path, 'link')
+    # replace_text_of_folder(csv_file_path_test, folder_need_to_change_path, 'link')
+    replace_text_of_folder(csv_file_path, folder_need_to_change_path, 'link')
