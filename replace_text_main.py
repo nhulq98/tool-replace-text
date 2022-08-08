@@ -95,7 +95,7 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
         # loop to all files in folder
         for file in file_names:
             is_found = False
-            if file.endswith(".jsp") or file.endswith(".vm"):
+            if file.endswith(".jsp") or file.endswith(".vm") or file.endswith(".html") or file.endswith(".js"):
                 file = os.path.join(dir_path, file)  # concat filename to path (/home/nhulq/index.html)
                 target_txt_file = file + ".txt"
                 try:
