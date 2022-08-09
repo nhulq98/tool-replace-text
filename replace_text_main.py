@@ -28,7 +28,8 @@ logging.basicConfig(level=logging.DEBUG,
 csv_file_path = '/home/nhulq/Desktop/shutto/tool-replace-text/input_folder/input.csv'
 csv_file_path_test = '/home/nhulq/Desktop/shutto/tool-replace-text/input_folder/input_test.csv'
 csv_file_output_path = '/home/nhulq/Desktop/shutto/tool-replace-text/output_folder/output.csv'
-folder_need_to_change_path = '/home/nhulq/Desktop/airtrip/skygserv/web'
+# folder_need_to_change_path = '/home/nhulq/Desktop/airtrip/skygserv/web'
+folder_need_to_change_path = '/home/nhulq/Desktop/static_css_project/skygserv/web'
 
 
 # html_tag_dict = {
@@ -77,7 +78,7 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
     example: replace_text_in_files_of_folder('D:/pythonProject/', 'lqnhu', 'lequangnhu')
     """
 
-    if(new_text == 'nothing' or new_text =='-'):
+    if (new_text == 'nothing' or new_text == '-'):
         return 'ok'
 
     logging.debug('Tìm \'' + old_text + '\' | action: \'' + new_text + '\'')
@@ -96,14 +97,19 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
         for file in file_names:
             is_found = False
             if file.endswith(".jsp") or file.endswith(".vm") or file.endswith(".html") or file.endswith(".js"):
+                if file.startswith('enq_template') == True:
+                    continue
+
                 file = os.path.join(dir_path, file)  # concat filename to path (/home/nhulq/index.html)
                 target_txt_file = file + ".txt"
                 try:
-                    with open(target_txt_file, "w", encoding="shift-jis") as target_file:  # open new file to write
-                        with open(file, errors="ignore", encoding="shift-jis") as source_file:  # open file in OS to find old_text!
+                    with open(target_txt_file, "w", encoding='MS932') as target_file:  # open new file to write
+                        with open(file, 'r', errors="ignore",
+                                  encoding='MS932') as source_file:  # open file in OS to find old_text!
+
                             # loop each line in current file
                             for line_text in source_file:
-                                text_find = "\""+old_text
+                                text_find = "\"" + old_text  # search with "/home/login.css because href="/home/..., avoid web/home/login.css
                                 find_result = line_text.find(text_find)
 
                                 # line_is_changed = _replace_reg.sub(new_text,
@@ -123,14 +129,16 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
                                         log_count_number_changed += 1
                                     else:
                                         if html_tag_type == 'img' or html_tag_type == 'link':  # action to delete
-                                            target_file.write(remove_html_tags(line_text, html_tag_type))
+                                            line_after_delete = remove_html_tags(line_text, html_tag_type)
+                                            if line_after_delete != '':
+                                                target_file.write(line_after_delete)
 
                                             logging.debug('Xóa thành công thẻ: ' + html_tag_type)
                                             log_count_number_changed += 1
 
                                         elif html_tag_type == 'script' or html_tag_type == 'SCRIPT':
                                             result = remove_html_tags(line_text, html_tag_type)
-                                            if result != False:
+                                            if result != False and result != '':
                                                 target_file.write(result)
 
                                                 logging.debug('Xóa thành công thẻ: ' + html_tag_type)
@@ -147,7 +155,7 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
 
                 finally:
                     if is_found == False:
-                        os.remove(target_txt_file)# remove file not contain old_text
+                        os.remove(target_txt_file)  # remove file not contain old_text
                     else:
                         os.remove(file)  # apply for Windows OS, let's comment this in linux OS
                         os.rename(target_txt_file, file)
