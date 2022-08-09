@@ -130,7 +130,7 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
                                     else:
                                         if html_tag_type == 'img' or html_tag_type == 'link':  # action to delete
                                             line_after_delete = remove_html_tags(line_text, html_tag_type)
-                                            if line_after_delete != '':
+                                            if line_after_delete.strip() != '':
                                                 target_file.write(line_after_delete)
 
                                             logging.debug('Xóa thành công thẻ: ' + html_tag_type)
@@ -138,7 +138,7 @@ def replace_text_in_files_of_folder(folder_target_path=None, old_text=None, new_
 
                                         elif html_tag_type == 'script' or html_tag_type == 'SCRIPT':
                                             result = remove_html_tags(line_text, html_tag_type)
-                                            if result != False and result != '':
+                                            if result != False and result.strip() != '':
                                                 target_file.write(result)
 
                                                 logging.debug('Xóa thành công thẻ: ' + html_tag_type)
