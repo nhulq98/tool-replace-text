@@ -62,7 +62,7 @@ def remove_html_tags(data=None, tag_type=None):
                           ' Hãy xử lý bằng tay!')
             return False
     else:
-        regex_object = re.compile(r'<' + tag_type + '.*?>', flags=re.IGNORECASE)
+        regex_object = re.compile(r'<' + tag_type + '.*?">', flags=re.IGNORECASE)
 
     return regex_object.sub('', data)  # remove tag type
 
